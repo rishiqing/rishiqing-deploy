@@ -4,6 +4,7 @@ import { argv }  from 'yargs';
 import Main      from '../main';
 
 const path   = argv.config || '.rishiqing-deploy.yml';
-const config = new Config({ yml: path }).parseYml();
+const env    = argv.env;
+const config = new Config({ yml: path, env }).parseYml();
 const main = new Main({ config });
 main.exec();
