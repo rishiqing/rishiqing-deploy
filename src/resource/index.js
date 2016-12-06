@@ -55,6 +55,7 @@ class Resource extends CommonNotify {
     let list = [];
     for (const file of ignore) {
       let p;
+      if (!file) continue;
       if (Util_File.isDirectory(dist)) {
         p = path.resolve(dist, file);
       } else if (Util_File.isFile(dist)) {

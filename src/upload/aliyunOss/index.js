@@ -79,7 +79,7 @@ class AliyunOss extends Upload {
     await this.rename(one, to);
     let count = 0;
     for (const file of this.options.files) {
-      await this.upload(file, this.options.target);
+      await this.upload(file, file.key);
       count++;
       process.stdout.write(`aliyunOss fileReplace process: ${count}/${this.options.files.length}\n`);
     }

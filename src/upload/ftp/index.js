@@ -85,6 +85,7 @@ class Ftp extends Upload {
       await this.putFile(file, this.param.path, key);
       this.uploadNotify(key);
     } catch (e) {
+      // console.log('e', e);
       process.stdout.write(e.message + ' : ' + file.file.path);
     }
   }
@@ -105,13 +106,11 @@ class Ftp extends Upload {
   async fileReplace () {
     this.ftp = await this.getFtp(this.param);
     existPathMap[this.param.host] = existPathMap[this.param.host] || [];
-
     const {one, to} = this.getFileReplaceData();
-
     await this.rename(one, to);
     let count = 0;
     for (const file of this.options.files) {
-      await this.upload(file, this.options.target);
+      await this.upload(file, file.key);
       count++;
       process.stdout.write(`ftp process: ${count}/${this.options.files.length}\n`);
     }

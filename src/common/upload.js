@@ -1,6 +1,10 @@
 import CommonNotify from './notify';
 import path from 'path';
 class Upload extends CommonNotify {
+  // 过滤语法
+  static format (c) {
+    return c.replace(/\s/g, '\\ ').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
+  }
   get uploadType () {
     return 'upload';
   }
@@ -14,7 +18,7 @@ class Upload extends CommonNotify {
     const prefix = this.param.path || this.param.prefix;
     const result = path.parse(this.options.target);
     const one = path.join(prefix, this.options.target);
-    const base = result.name + '_' + (new Date()).toString() + '_' + result.ext
+    const base = result.name + '_' + (new Date()).getTime() + result.ext
     const to = path.join(prefix, path.format({ dir: result.dir, base: base }));
     return { one, to };
   }

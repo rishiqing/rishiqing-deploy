@@ -34,7 +34,7 @@ class FileReplace extends CommonNotify {
     await ssh2.fileReplace();
   }
 
-  getFiles (dist, ignore) {
+  getFiles (dist, ignore, target) {
     const list = [];
     const fileList = Util_File.readFileList(dist) || [];
     const ignoreList = this.initIgnoreList(dist, ignore);
@@ -42,9 +42,17 @@ class FileReplace extends CommonNotify {
       if (ignoreList.indexOf(file.path) === -1) {
         let key;
         if (Util_File.isFile(dist)) {
-          key = file.name;
+          if (target) {
+            key = target;
+          } else {
+            key = file.name;
+          }
         } else if (Util_File.isDirectory(dist)) {
-          key = file.path.replace(dist, '');
+          if (target) {
+            key = path.join(target, file.path.replace(dist, ''));
+          } else {
+            key = file.path.replace(dist, '');
+          }
         }
         list.push({ file: file, key: key });
       }
@@ -85,7 +93,7 @@ class FileReplace extends CommonNotify {
             const fn = this[upload.type];
             const param = upload.param;
             if (fn && typeof fn === 'function') {
-              const files = this.getFiles(distPath, ignore);
+              const files = this.getFiles(distPath, ignore, target);
               await fn.call(this, param, { files, target });
             }
           }

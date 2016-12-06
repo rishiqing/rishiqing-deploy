@@ -3,10 +3,6 @@ import { spawn } from 'child_process';
 import path      from 'path';
 const existPathMap = {};
 class Ssh2 extends Upload {
-  // 过滤ssh语法
-  static format (c) {
-    return c.replace(/\s/g, '\\ ').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
-  }
   get uploadType () {
     return 'ssh2';
   }
@@ -108,7 +104,7 @@ class Ssh2 extends Upload {
     await this.rename(one, to);
     let count = 0;
     for (const file of this.options.files) {
-      await this.upload(file, this.options.target);
+      await this.upload(file, file.key);
       count++;
       process.stdout.write(`ssh2 process: ${count}/${this.options.files.length}\n`);
     }
