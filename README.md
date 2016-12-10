@@ -40,7 +40,7 @@ EndBuild is used to do some work after uploads, such as clean directory.
 
 ## Usage
 ### Configuration file
-Without install rishiqing-deploy globally, you can install it locally, then add a script filed to your `package.json`
+Without install rishiqing-deploy globally, you can install it locally, then add a script field to your `package.json`
 ```json
 {
   "script": {
@@ -178,4 +178,4 @@ production: # the production environment. will covere the defualt config
 
 [MIT](http://opensource.org/licenses/MIT)
 
-Copyright (c) 2013-2016 [Rishiqing](https://www.rishiqing.com)
+Copyright (c) 2014-2016 [Rishiqing](https://www.rishiqing.com)
