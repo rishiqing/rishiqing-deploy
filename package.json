@@ -1,6 +1,6 @@
 {
   "name": "rishiqing-deploy",
-  "version": "0.0.11",
+  "version": "0.0.13",
   "description": "rishiqing front auto deploy",
   "main": "lib/index.js",
   "bin": {
@@ -24,7 +24,7 @@
     "sdk"
   ],
   "author": "qinyang",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/rishiqing/rishiqing-deploy/issues"
   },
