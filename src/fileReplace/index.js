@@ -1,82 +1,16 @@
-import CommonNotify from '../common/notify';
-import AliyunOss    from '../upload/aliyunOss';
-import Ftp          from '../upload/ftp';
-import Sftp         from '../upload/sftp';
-import Ssh2         from '../upload/ssh2';
+import DealFile     from '../common/dealFile';
 import _            from 'lodash';
 import path         from 'path';
 import fs           from 'fs';
-import Util_File    from '../utils/file';
 
-class FileReplace extends CommonNotify {
+class FileReplace extends DealFile {
+  get type () {
+    return 'fileReplace';
+  }
+
   constructor (opt) {
     super(opt);
     this.list =_.isArray(opt) ? opt : [opt];
-  }
-
-  async aliyunOss (param, options) {
-    const oss = new AliyunOss(param, options);
-    await oss.fileReplace();
-  }
-
-  async ftp (param, options) {
-    const ftp = new Ftp(param, options);
-    await ftp.fileReplace();
-  }
-
-  async sftp (param, options) {
-    const sftp = new Sftp(param, options);
-    await sftp.fileReplace();
-  }
-
-  async ssh2 (param, options) {
-    const ssh2 = new Ssh2(param, options);
-    await ssh2.fileReplace();
-  }
-
-  getFiles (dist, ignore, target) {
-    const list = [];
-    const fileList = Util_File.readFileList(dist) || [];
-    const ignoreList = this.initIgnoreList(dist, ignore);
-    for (const file of fileList) {
-      if (ignoreList.indexOf(file.path) === -1) {
-        let key;
-        if (Util_File.isFile(dist)) {
-          if (target) {
-            key = target;
-          } else {
-            key = file.name;
-          }
-        } else if (Util_File.isDirectory(dist)) {
-          if (target) {
-            key = path.join(target, file.path.replace(dist, ''));
-          } else {
-            key = file.path.replace(dist, '');
-          }
-        }
-        list.push({ file: file, key: key });
-      }
-    }
-    return list;
-  }
-
-  initIgnoreList (dist, ignore = []) {
-    let list = [];
-    for (const file of ignore) {
-      let p;
-      if (!file) continue;
-      if (Util_File.isDirectory(dist)) {
-        p = path.resolve(dist, file);
-      } else if (Util_File.isFile(dist)) {
-        p = path.resolve(file);
-      }
-      if (Util_File.isDirectory(p)) {
-        list = list.concat(_.map(Util_File.readFileList(p), 'path'));
-      } else if (Util_File.isFile(p)) {
-        list.push(p);
-      }
-    }
-    return list;
   }
 
   async exec () {
