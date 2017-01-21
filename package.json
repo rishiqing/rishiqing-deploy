@@ -1,6 +1,6 @@
 {
   "name": "rishiqing-deploy",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "rishiqing front auto deploy",
   "main": "lib/index.js",
   "bin": {
