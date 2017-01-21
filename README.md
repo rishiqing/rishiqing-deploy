@@ -84,10 +84,11 @@ default: # the default config
     - 'npm run webpack'
   resource:
     - dist: 'dist' # local file or directory
-      ignore: # the ignore list
+      ignore: # the ignore list, support regexp
         - 'images'
         - 'index.html'
         - 'manifest.json'
+        - '/\\.map$/' # '\' must be '\' escaped
       upload: # specify the upload tool. the tools specified will been executed one by one.
         - type: 'aliyunOss'
           param:
@@ -158,6 +159,7 @@ production: # the production environment. will covere the defualt config
         - 'images'
         - 'index.html'
         - 'manifest.json'
+        - '/\\.map$/' # '\' must be '\' escaped
       upload:
         - type: 'sftp'
           param:
