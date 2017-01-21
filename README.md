@@ -88,7 +88,7 @@ default: # the default config
         - 'images'
         - 'index.html'
         - 'manifest.json'
-        - '/\\.map$/' # '\' must be '\' escaped
+        - '/\.map$/'
       upload: # specify the upload tool. the tools specified will been executed one by one.
         - type: 'aliyunOss'
           param:
