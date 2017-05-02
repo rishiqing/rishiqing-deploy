@@ -24,12 +24,7 @@ class FileReplace extends DealFile {
           const distPath = path.resolve(dist);
           fs.lstatSync(distPath); // 检测这个文件或者目录是否存在
           for (const upload of uploadDest) {
-            const fn = this[upload.type];
-            const param = upload.param;
-            if (fn && typeof fn === 'function') {
-              const files = this.getFiles(distPath, ignore, target);
-              await fn.call(this, param, { files, target });
-            }
+            await this.execUpload(upload, { distPath, ignore, target });
           }
         } catch (e) {
           process.stdout.write(e.message);

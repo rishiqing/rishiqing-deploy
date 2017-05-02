@@ -1,7 +1,7 @@
 // 这个模块负责整合所有通知，包括整理通知内容
 // 这里是一个中转站，负责把其他模块的通知内容，整合之后，发送到 notify里，进行真正的通知
 import EventEmitter from 'events';
-import NotifyNode   from './notifyNode';
+import nd           from './notifyNode';
 
 const Event = new EventEmitter();
 const Events = {
@@ -19,20 +19,6 @@ class Notify {
   get notifyOrigin () {
     return 'default';
   }
-  constructor () {
-    this.initNotifyNode();
-  }
-  initNotifyNode () {
-    for (const node in NotifyNode) {
-      const entry = NotifyNode[node];
-      this[entry.method] = ((node, entry) => {
-        return (_message) => {
-          const message = _message || entry.message;
-          this.pushMessage({ node, message });
-        };
-      })(node, entry);
-    }
-  }
   // 推送普通消息
   pushMessage (opt = {}) {
     Event.emit(Events.ON_MESSAGE, opt);
@@ -41,6 +27,16 @@ class Notify {
   pushError (error = {}) {
     Event.emit(Events.ON_ERROR, error);
   }
+}
+
+for (const node in nd) {
+  const entry = nd[node];
+  Notify.prototype[entry.method] = ((node, entry) => {
+    return (_message) => {
+      const message = _message || entry.message;
+      this.pushMessage({ node, message });
+    };
+  })(node, entry);
 }
 
 export default Notify;
