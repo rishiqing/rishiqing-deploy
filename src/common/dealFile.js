@@ -25,7 +25,7 @@ class DealFile extends CommonNotify {
     if (Uploaders[uploaderType]) {
       const { distPath, ignore, target } = options;
       const files = this.getFiles(distPath, ignore, target);
-      const uploader = new Uploaders[uploaderType](param, { files, target });
+      const uploader = new Uploaders[uploaderType](param, { files, distPath, target });
       await uploader[this.type]();
     }
   }

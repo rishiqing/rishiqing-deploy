@@ -31,8 +31,8 @@ class Notify {
 
 for (const node in nd) {
   const entry = nd[node];
-  Notify.prototype[entry.method] = ((node, entry) => {
-    return (_message) => {
+  (function (node, entry) {
+    Notify.prototype[entry.method] = function (_message) {
       const message = _message || entry.message;
       this.pushMessage({ node, message });
     };

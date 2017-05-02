@@ -1,6 +1,20 @@
 import CommonNotify from './notify';
 import path from 'path';
+
+const _uploadFileStatistics = [];
 class Upload extends CommonNotify {
+  static get UploadFileStatistics () {
+    return _uploadFileStatistics;
+  }
+  static pushToStatistics (file, options) {
+    const statistics = this.formatStatistics(file, options);
+    this.UploadFileStatistics.push(statistics);
+  }
+  static formatStatistics (file = {}, options = {}) {
+    const { type, size, name, isGzip, extname, md5, path } = file;
+    const time = (new Date()).toString();
+    return Object.assign({ type, size, name, isGzip, extname, md5, path, time }, options);
+  }
   // 过滤语法
   static format (c) {
     return c.replace(/\s/g, '\\ ').replace(/\(/g, '\\(').replace(/\)/g, '\\)');
@@ -29,6 +43,11 @@ class Upload extends CommonNotify {
   // 当upload全部结束的时候，触发
   uploadEndNotify () {
     this.oneUploadNotify(`${this.uploadType}[${this.param.host || this.param.bucket}]`);
+  }
+  // 上传之后，把file加入到统计列表中
+  addStatistics (file, options = {}) {
+    options.uploadType = this.uploadType;
+    this.constructor.pushToStatistics(file, options);
   }
 }
 
