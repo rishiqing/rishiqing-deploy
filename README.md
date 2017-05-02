@@ -65,6 +65,7 @@ default: # the default config
       - 'resource' # after all resources tasks
       - 'one-file-replace' # after one fileReplace task
       - 'file-replace' # after all fileReplace tasks
+      - 'statistics' # send the statistics information
       - 'success' # ending with success
       - 'error' # when error throwing out
     list:
