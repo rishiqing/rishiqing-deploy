@@ -42,6 +42,7 @@ class AliyunOss extends Upload {
     read.pipe(uploader);
     await ossUpload(uploader);
     this.uploadNotify(key);
+    this.addStatistics(file.file, { distPath: this.options.distPath });
   }
   // 重命名
   async rename (one, to) {

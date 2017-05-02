@@ -80,6 +80,7 @@ class Ssh2 extends Upload {
     try {
       await this.putFile(file, this.param.path, key);
       this.uploadNotify(key);
+      this.addStatistics(file.file, { distPath: this.options.distPath });
     } catch (e) {
       process.stdout.write(e.message + ' : ' + file.file.path);
     }

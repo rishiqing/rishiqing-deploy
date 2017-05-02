@@ -31,6 +31,10 @@ export default {
     method: 'fileReplaceNotify',
     message: 'File Replace'
   },
+  'statistics': {
+    method: 'statisticsNotify',
+    message: 'statistics'
+  },
   'success': {
     method: 'successNotify',
     message: 'Success'

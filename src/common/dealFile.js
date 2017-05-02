@@ -7,29 +7,27 @@ import Ssh2         from '../upload/ssh2';
 import Util_File    from '../utils/file';
 import path         from 'path';
 
+const Uploaders = {
+  aliyunOss: AliyunOss,
+  ftp: Ftp,
+  sftp: Sftp,
+  ssh2: Ssh2
+};
+
 class DealFile extends CommonNotify {
   get type () {
     return ''; // resource | fileReplace
   }
 
-  async aliyunOss (param, options) {
-    const oss = new AliyunOss(param, options);
-    await oss[this.type]();
-  }
-
-  async ftp (param, options) {
-    const ftp = new Ftp(param, options);
-    await ftp[this.type]();
-  }
-
-  async sftp (param, options) {
-    const sftp = new Sftp(param, options);
-    await sftp[this.type]();
-  }
-
-  async ssh2 (param, options) {
-    const ssh2 = new Ssh2(param, options);
-    await ssh2[this.type]();
+  async execUpload (uploadConfig, options = {}) {
+    const uploaderType = uploadConfig.type;
+    const param = uploadConfig.param;
+    if (Uploaders[uploaderType]) {
+      const { distPath, ignore, target } = options;
+      const files = this.getFiles(distPath, ignore, target);
+      const uploader = new Uploaders[uploaderType](param, { files, distPath, target });
+      await uploader[this.type]();
+    }
   }
 
   getFiles (dist, ignore, target) { // target 用来指定文件上传到服务器之后的名字

@@ -1,9 +1,15 @@
-import Build       from '../build';
-import Resource    from '../resource';
-import FileReplace from '../fileReplace';
+import Build        from '../build';
+import Resource     from '../resource';
+import FileReplace  from '../fileReplace';
+import Notify       from '../notify';
+import Upload       from '../common/upload';
+import Statistics   from '../common/statistics';
+import CommonNotify from '../common/notify';
+
 const order = ['build', 'resource', 'fileReplace', 'endBuild'];
-class Step {
+class Step extends CommonNotify {
   constructor (props) {
+    super(props);
     this.config = props.config;
   }
   // 执行命令
@@ -28,12 +34,21 @@ class Step {
   }
   // 开始执行
   async exec () {
-    for (const item of order) {
-      const fn = this[item];
-      const params = this.config[item];
-      if (fn && typeof fn === 'function' && params) {
-        await fn.call(this, params);
+    try {
+      const notify = new Notify({ config: this.config });
+      notify.init();
+      for (const item of order) {
+        const fn = this[item];
+        const params = this.config[item];
+        if (fn && typeof fn === 'function' && params) {
+          await fn.call(this, params);
+        }
       }
+      this.statisticsNotify(Statistics.analyze(Upload.UploadFileStatistics || []));
+      this.successNotify();
+    } catch(e) {
+      console.error(e); // eslint-disable-line
+      process.exit(1);
     }
   }
 }
