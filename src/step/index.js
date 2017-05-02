@@ -1,6 +1,7 @@
 import Build       from '../build';
 import Resource    from '../resource';
 import FileReplace from '../fileReplace';
+import Notify      from '../notify';
 const order = ['build', 'resource', 'fileReplace', 'endBuild'];
 class Step {
   constructor (props) {
@@ -28,6 +29,8 @@ class Step {
   }
   // 开始执行
   async exec () {
+    const notify = new Notify({ config: this.config });
+    notify.init();
     for (const item of order) {
       const fn = this[item];
       const params = this.config[item];
@@ -35,6 +38,7 @@ class Step {
         await fn.call(this, params);
       }
     }
+    this.successNotify();
   }
 }
 
