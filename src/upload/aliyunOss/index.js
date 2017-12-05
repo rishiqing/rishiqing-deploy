@@ -8,6 +8,9 @@ import fs             from 'fs';
 function ossUpload (upload) {
   return new Promise(function (resolve, reject) {
     upload.on('error', reject);
+    upload.on('part', function (part) {
+      process.stdout.write(`aliyunOss part ${part.PartNumber}\n`);
+    });
     upload.on('uploaded', resolve);
   });
 }
@@ -38,6 +41,7 @@ class AliyunOss extends Upload {
       data.ContentEncoding = 'gzip';
     }
     const uploader = this.ossStream.upload(data);
+    uploader.minPartSize(4194304); // 每4M分一块
     const read = fs.createReadStream(file.file.path);
     read.pipe(uploader);
     await ossUpload(uploader);
