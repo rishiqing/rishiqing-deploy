@@ -27,8 +27,11 @@ class Build extends Notify {
   async exec () {
     for (const command of this.list) {
       if (command && typeof command === 'string') {
-        const c = command.split(' ')[0];
+        let c = command.split(' ')[0];
         const arg = command.split(' ').slice(1);
+        if (c === 'npm') {
+          if (process.platform === 'win32') c = 'npm.cmd';
+        }
         const p = spawn(c, arg, { stdio: 'inherit' });
         await promiseFromChildProcess(p);
         this.oneBuildNotify(command);
