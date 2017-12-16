@@ -31,7 +31,7 @@ class AliyunOss extends Upload {
     this.ossStream = ALY_OSS_STREAM(this.oss);
   }
   async upload (file, key) {
-    const _key = path.join(this.param.prefix, key);
+    const _key = path.join(this.param.prefix, key).replace(/\\/g, '/');
     const data = {
       Bucket: this.param.bucket,
       Key: _key,
