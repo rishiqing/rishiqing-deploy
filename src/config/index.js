@@ -1,4 +1,5 @@
-import Yml    from 'yml';
+import Yml        from 'yml';
+
 class Config {
   constructor (options) {
     this.ymlPath = options.yml || '.rishiqing-deploy.yml';
@@ -6,8 +7,12 @@ class Config {
   }
   // 从yml文件解析配置参数
   parseYml () {
-    const data = Yml.load(this.ymlPath, this.env);
-    return data;
+    const c = Yml.load(this.ymlPath, this.env);
+    // 替换${KEY} 包裹的环境变量
+    const dataString = JSON.stringify(c).replace(/\$\{([^\{\}]+)\}/g, (match, key) => {
+      return process.env[key];
+    });
+    return JSON.parse(dataString);
   }
 }
 
