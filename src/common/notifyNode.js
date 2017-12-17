@@ -33,7 +33,7 @@ export default {
   },
   'statistics': {
     method: 'statisticsNotify',
-    message: 'statistics'
+    message: 'Statistics'
   },
   'success': {
     method: 'successNotify',

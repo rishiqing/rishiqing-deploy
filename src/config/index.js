@@ -1,4 +1,4 @@
-import Yml        from 'yml';
+import Yml           from 'yml';
 
 class Config {
   constructor (options) {
@@ -9,9 +9,19 @@ class Config {
   parseYml () {
     const c = Yml.load(this.ymlPath, this.env);
     // 替换${KEY} 包裹的环境变量
+    const NotFoundMap = {};
     const dataString = JSON.stringify(c).replace(/\$\{([^\{\}]+)\}/g, (match, key) => {
+      if (process.env[key] === undefined) {
+        NotFoundMap[key] = true;
+      }
       return process.env[key];
     });
+    // 找不到环境变量，直接退出
+    const NotFoundList = Object.keys(NotFoundMap);
+    if (NotFoundList.length > 0) {
+      process.stdout.write(`Error: ${NotFoundList.join()} environment not found\n`);
+      process.exit(1);
+    }
     return JSON.parse(dataString);
   }
 }
