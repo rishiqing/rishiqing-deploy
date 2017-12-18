@@ -16,5 +16,6 @@ export default {
   '.gif':   'image',
   '.png':   'image',
   '.map':   'map',
-  '.gz':    'gz'
+  '.gz':    'gz',
+  '.yml':   'yml'
 };

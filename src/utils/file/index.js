@@ -1,8 +1,8 @@
 /*
 * @Author: apple
 * @Date:   2016-01-15 12:11:47
-* @Last Modified by:   qin yang
-* @Last Modified time: 2016-12-04 19:18:39
+* @Last Modified by:   qinyang
+* @Last Modified time: 2017-12-18 10:53:46
 */
 
 import File from './file';
@@ -128,6 +128,10 @@ class Index {
     }
     traverse(p);
     return fileList;
+  }
+
+  static createFile (file, data, options) {
+    return fs.writeFileSync(file, data, options);
   }
 }
 

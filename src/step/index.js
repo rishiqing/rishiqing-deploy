@@ -1,12 +1,13 @@
 import Build        from '../build';
 import Resource     from '../resource';
 import FileReplace  from '../fileReplace';
+import Convert      from '../convert';
 import Notify       from '../notify';
 import Upload       from '../common/upload';
 import Statistics   from '../common/statistics';
 import CommonNotify from '../common/notify';
 
-const order = ['build', 'resource', 'fileReplace', 'endBuild'];
+const order = ['build', 'convert', 'resource', 'fileReplace', 'endBuild'];
 class Step extends CommonNotify {
   constructor (props) {
     super(props);
@@ -31,6 +32,10 @@ class Step extends CommonNotify {
   async endBuild (param) {
     const build = new Build(param);
     await build.exec();
+  }
+  async convert (param) {
+    const convert = new Convert(param);
+    await convert.exec();
   }
   // 开始执行
   async exec () {
