@@ -7,6 +7,10 @@ export default {
     method: 'oneBuildNotify',
     message: 'One Build'
   },
+  'after-convert': {
+    method: 'afterConvertNotify',
+    message: 'After Convert'
+  },
   'one-upload': {
     method: 'oneUploadNotify',
     message: 'One Upload'

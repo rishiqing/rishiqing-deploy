@@ -81,6 +81,9 @@ default: # the default config
             - 'one-file-replace'
             - 'file-replace'
             - 'success'
+  convert: # convert file type (now support convert yml to json)
+    - target: /path/to/the/file/to/be/converted
+      dest: /path/to/output
   build: # define the build command list
     - 'npm run webpack'
   resource:
