@@ -86,8 +86,7 @@ class Ftp extends Upload {
       this.uploadNotify(key);
       this.addStatistics(file.file, { distPath: this.options.distPath });
     } catch (e) {
-      // console.log('e', e);
-      process.stdout.write(e.message + ' : ' + file.file.path);
+      process.stdout.write(e.message + ' : ' + file.file.path + '\n');
     }
   }
 

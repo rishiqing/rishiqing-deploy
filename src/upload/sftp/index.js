@@ -17,7 +17,12 @@ class Sftp extends Upload {
       const client = new Client();
       client.on('ready', function () {
         resolve(client);
-      }).connect(config);
+      })
+      .on('error', function (err) {
+        // 不知道为啥，下面执行 this.client.end()的时候，会报错
+        process.stdout.write('I don\'t know why this error throw! caused by client.end()\n');
+      })
+      .connect(config);
     });
   }
 
@@ -47,7 +52,7 @@ class Sftp extends Upload {
 
   mkdir (_path) {
     return new Promise((resolve, reject) => {
-      this.client.exec('mkdir -p ' + _path, function (err) {
+      this.sftp.mkdir(_path, function (err) {
         if (err) {
           reject(err);
         } else {
@@ -57,11 +62,25 @@ class Sftp extends Upload {
     });
   }
 
+  // 类似于 mkdir -p 这种命令
+  // 由于ssh2里面sftp没有mkdir -p的功能
+  // 所以这里手动实现-p参数
+  async mkdirP (_path) {
+    const list = _path.split('/');
+    for (let index = 1; index < list.length; index++) {
+      const tmpPath = list.slice(0, index + 1).join('/');
+      const isExist = await this.isPathExist(tmpPath);
+      if (!isExist) {
+        await this.mkdir(tmpPath);
+      }
+    }
+  }
+
   async ftpPathExistAndMkdir (_path) {
     if (existPathMap[this.param.host].indexOf(_path) === -1) {
       const exist = await this.isPathExist(_path);
       if (!exist) {
-        await this.mkdir(_path);
+        await this.mkdirP(_path);
       }
       existPathMap[this.param.host].push(_path);
     }
@@ -101,7 +120,7 @@ class Sftp extends Upload {
       this.uploadNotify(key);
       this.addStatistics(file.file, { distPath: this.options.distPath });
     } catch (e) {
-      process.stdout.write(e.message + ' : ' + file.file.path);
+      process.stdout.write(e.message + ' : ' + file.file.path + '\n');
     }
   }
 

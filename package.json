@@ -1,6 +1,6 @@
 {
   "name": "rishiqing-deploy",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "rishiqing front auto deploy",
   "main": "lib/index.js",
   "bin": {
@@ -51,6 +51,6 @@
     "ssh2": "^0.5.4",
     "sync-request": "^3.0.1",
     "yargs": "^6.5.0",
-    "yml": "0.0.5"
+    "yml": "^1.0.0"
   }
 }
