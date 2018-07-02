@@ -3,9 +3,15 @@ import CommonNotify from '../common/notify';
 import Bearychat    from './bearychat';
 import _            from 'lodash';
 
+const DefaultConfig = {
+  title: 'rishiqing-deploy',
+  nodes: [],
+  list: []
+};
+
 class Notify {
   constructor (props) {
-    this.config = props.config.notify;
+    this.config = Object.assign({}, DefaultConfig, props.config.notify);
     this.Events = CommonNotify.Events;
     this.Event  = CommonNotify.Event;
     this.Event.on(this.Events.ON_MESSAGE, this.onMessage.bind(this));
