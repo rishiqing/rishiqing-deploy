@@ -18,7 +18,8 @@ class Ssh2 extends Upload {
       child.stdout.on('data', () => {
         resolve(true);
       });
-      child.stderr.on('data', () => {
+      child.stderr.on('data', (data) => {
+        console.log(`ssh2 "isPathExist" stderr: ${data}`)
         resolve(false);
       });
     });
@@ -35,6 +36,10 @@ class Ssh2 extends Upload {
           reject(code);
         }
       });
+      child.stderr.on('data', (data) => {
+        console.log(`ssh2 "mkdir" stderr: ${data}`)
+        resolve(false);
+      });
     });
   }
 
@@ -45,6 +50,10 @@ class Ssh2 extends Upload {
       const child = spawn('ssh', [`${this.param.user}@${this.param.host}`, `mv ${_one} ${_to}`]);
       child.on('close', (code) => {
         resolve(code);
+      });
+      child.stderr.on('data', (data) => {
+        console.log(`ssh2 "rename" stderr: ${data}`)
+        resolve(false);
       });
     });
   }
