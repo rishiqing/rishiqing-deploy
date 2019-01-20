@@ -19,7 +19,7 @@ class Ssh2 extends Upload {
         resolve(true);
       });
       child.stderr.on('data', (data) => {
-        console.log(`ssh2 "isPathExist" stderr: ${data}`)
+        console.log(`ssh2 "isPathExist" stderr: ${data}`); // eslint-disable-line
         resolve(false);
       });
     });
@@ -37,7 +37,7 @@ class Ssh2 extends Upload {
         }
       });
       child.stderr.on('data', (data) => {
-        console.log(`ssh2 "mkdir" stderr: ${data}`)
+        console.log(`ssh2 "mkdir" stderr: ${data}`); // eslint-disable-line
         resolve(false);
       });
     });
@@ -52,7 +52,7 @@ class Ssh2 extends Upload {
         resolve(code);
       });
       child.stderr.on('data', (data) => {
-        console.log(`ssh2 "rename" stderr: ${data}`)
+        console.log(`ssh2 "rename" stderr: ${data}`); // eslint-disable-line
         resolve(false);
       });
     });

@@ -10,7 +10,7 @@ class Config {
     const c = Yml.load(this.ymlPath, this.env);
     // 替换${KEY} 包裹的环境变量
     const NotFoundMap = {};
-    const dataString = JSON.stringify(c).replace(/\$\{([^\{\}]+)\}/g, (match, key) => {
+    const dataString = JSON.stringify(c).replace(/\$\{([^\{\}]+)\}/g, (match, key) => { // eslint-disable-line
       if (process.env[key] === undefined) {
         NotFoundMap[key] = true;
       }
