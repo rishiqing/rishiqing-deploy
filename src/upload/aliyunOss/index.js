@@ -40,19 +40,13 @@ class AliyunOss extends Upload {
 
   // 从one copy 到 to
   async copy (one, to) {
-    return new Promise((resolve) => {
-      const source = path.join('/', this.param.bucket, one).replace(/\\/g, '/'); // 把路径中的\替换成/，这是由于windows系统下，会有\出现，导致在oss上找不到对应的文件
-      this.oss.copyObject({
-        Bucket: this.param.bucket,
-        CopySource: source,
-        Key: to.replace(/\\/g, '/')
-      }, (err) => {
-        if (err) {
-          process.stdout.write(err.message + '\n');
-        }
-        resolve();
-      });
-    });
+    const name = to.replace(/\\/g, '/')
+    const source = path.join('/', this.param.bucket, one).replace(/\\/g, '/'); // 把路径中的\替换成/，这是由于windows系统下，会有\出现，导致在oss上找不到对应的文件
+    try {
+      await this.oss.copy(name, source)
+    } catch(e) {
+      process.stdout.write(`${e.message} : ${one}\n`)
+    }
   }
 
   async resource () {
