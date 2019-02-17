@@ -1,20 +1,8 @@
 import Upload         from '../../common/upload';
-import { OSS }        from 'aliyun-sdk';
-import ALY_OSS_STREAM from 'aliyun-oss-upload-stream';
+import OSS            from 'ali-oss';
 import guessType      from 'guess-content-type';
 import path           from 'path';
 import fs             from 'fs';
-
-function ossUpload (upload) {
-  return new Promise(function (resolve, reject) {
-    upload.on('error', reject);
-    upload.on('part', function (part) {
-      process.stdout.write(`aliyunOss part ${part.PartNumber}\n`);
-    });
-    upload.on('uploaded', resolve);
-  });
-}
-
 
 class AliyunOss extends Upload {
   get uploadType () {
@@ -24,27 +12,24 @@ class AliyunOss extends Upload {
     super(param, options);
     this.oss = new OSS({
       accessKeyId: this.param.accessKeyId,
-      secretAccessKey: this.param.secretAccessKey,
-      endpoint: this.param.endpoint,
-      apiVersion: '2013-10-15'
+      accessKeySecret: this.param.accessKeySecret || this.param.secretAccessKey,
+      region: this.param.region,
+      endpoint: this.param.endpoint, // endpoint takes priority over region
+      apiVersion: '2013-10-15',
+      bucket: this.param.bucket
     });
-    this.ossStream = ALY_OSS_STREAM(this.oss);
   }
   async upload (file, key) {
     const _key = path.join(this.param.prefix, key).replace(/\\/g, '/');
-    const data = {
-      Bucket: this.param.bucket,
-      Key: _key,
-      ContentType: guessType(_key)
-    };
-    if (file.file.isGzip) {
-      data.ContentEncoding = 'gzip';
+    const headers = {
+      'Content-Type': guessType(_key)
     }
-    const uploader = this.ossStream.upload(data);
-    uploader.minPartSize(4194304); // 每4M分一块
-    const read = fs.createReadStream(file.file.path);
-    read.pipe(uploader);
-    await ossUpload(uploader);
+    if (file.file.isGzip) {
+      headers['Content-Encoding'] = 'gzip';
+    }
+    await this.oss.put(_key, fs.createReadStream(file.file.path), {
+      headers
+    });
     this.uploadNotify(key);
     this.addStatistics(file.file, { distPath: this.options.distPath });
   }

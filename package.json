@@ -1,6 +1,6 @@
 {
   "name": "rishiqing-deploy",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "rishiqing front auto deploy",
   "main": "lib/index.js",
   "bin": {
@@ -40,8 +40,7 @@
     "eslint": "^3.11.1"
   },
   "dependencies": {
-    "aliyun-oss-upload-stream": "^1.3.0",
-    "aliyun-sdk": "^1.9.12",
+    "ali-oss": "^6.1.0",
     "babel-runtime": "^6.18.0",
     "ftp": "^0.3.10",
     "guess-content-type": "^0.1.0",
