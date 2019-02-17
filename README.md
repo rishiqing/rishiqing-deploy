@@ -97,8 +97,16 @@ default: # the default config
         - type: 'aliyunOss'
           param:
             accessKeyId: ''
+            # accessKeySecret and secretAccessKey is same
+            # There are two because the earliest parameter is called secretAccessKey
+            # but after updating ali-oss, the parameter name was changed to accessKeySecret
+            # in order to be compatible with the previous configuration, two parameters are supported at the same time.
+            accessKeySecret: ''
             secretAccessKey: ''
             bucket: ''
+            # Set the region or endpoint
+            region: 'oss-cn-beijing'
+            # the priority of the endpoint is higher than the region
             endpoint: 'http://oss-cn-beijing.aliyuncs.com'
             prefix: ''
         - type: 'ftp'
@@ -130,8 +138,16 @@ default: # the default config
         - type: 'aliyunOss'
           param:
             accessKeyId: ''
+            # accessKeySecret and secretAccessKey is same
+            # There are two because the earliest parameter is called secretAccessKey
+            # but after updating ali-oss, the parameter name was changed to accessKeySecret
+            # in order to be compatible with the previous configuration, two parameters are supported at the same time.
+            accessKeySecret: ''
             secretAccessKey: ''
             bucket: ''
+            # Set the region or endpoint
+            region: 'oss-cn-beijing'
+            # the priority of the endpoint is higher than the region
             endpoint: 'http://oss-cn-beijing.aliyuncs.com'
             prefix: ''
         - type: 'ftp'
