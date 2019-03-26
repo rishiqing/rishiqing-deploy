@@ -55,7 +55,7 @@ class Step extends CommonNotify {
         const logs = await DeployLog.getLog(this.config.deployLog)
         this.deployLogNotify(logs);
       } catch(e) {
-        console.error('deployLogNotify error: ', e.message); // eslint-disable-line
+        console.error('deployLogNotify error: ', e.message, e); // eslint-disable-line
       }
       this.successNotify();
     } catch(e) {
