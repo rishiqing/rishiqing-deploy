@@ -43,12 +43,14 @@
     "ali-oss": "^6.1.0",
     "babel-runtime": "^6.18.0",
     "ftp": "^0.3.10",
+    "gitlab": "^4.5.1",
     "guess-content-type": "^0.1.0",
     "is-gzip": "^1.0.0",
     "lodash": "^4.17.2",
     "md5-file": "^3.1.1",
+    "moment": "^2.24.0",
     "ssh2": "^0.5.4",
-    "sync-request": "^3.0.1",
+    "sync-request": "^6.1.0",
     "yargs": "^6.5.0",
     "yml": "^1.0.0"
   }

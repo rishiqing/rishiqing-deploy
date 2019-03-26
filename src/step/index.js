@@ -5,6 +5,7 @@ import Convert      from '../convert';
 import Notify       from '../notify';
 import Upload       from '../common/upload';
 import Statistics   from '../common/statistics';
+import DeployLog    from '../common/deployLog';
 import CommonNotify from '../common/notify';
 
 const order = ['build', 'convert', 'resource', 'fileReplace', 'endBuild'];
@@ -50,6 +51,12 @@ class Step extends CommonNotify {
         }
       }
       this.statisticsNotify(Statistics.analyze(Upload.UploadFileStatistics || []));
+      try {
+        const logs = await DeployLog.getLog(this.config.deployLog)
+        this.deployLogNotify(logs);
+      } catch(e) {
+        console.error('deployLogNotify error: ', e.message); // eslint-disable-line
+      }
       this.successNotify();
     } catch(e) {
       console.error(e); // eslint-disable-line

@@ -46,5 +46,9 @@ export default {
   'error': {
     method: 'errorNotify',
     message: 'Error'
+  },
+  'deploy-log': {
+    method: 'deployLogNotify',
+    message: 'DeployLog'
   }
 };

@@ -68,8 +68,9 @@ default: # the default config
       - 'statistics' # send the statistics information
       - 'success' # ending with success
       - 'error' # when error throwing out
+      - 'deploy-log' # generate deploy log after build
     list:
-      - type: bearychat # notification list. now only bearychat
+      - type: bearychat # bearychat notification
         param:
           hook: '' # bearychat incoming hook
           user: 'qinyang' # the user who you want to notify
@@ -81,9 +82,29 @@ default: # the default config
             - 'one-file-replace'
             - 'file-replace'
             - 'success'
+      - type: dingtalk # dingding notification
+        param:
+          hook: 'https://oapi.dingtalk.com/robot/send?access_token=xxxxx' # dingtalk notification hook
+  deployLog: # deploy log
+    type: gitlab # generate deploy log from gitlab
+    param:
+      url: https://gitlab.com
+      match: '/^log--/' # match commit message begin with log--
+      token: '' # token has higher priority than jobToken
+      jobToken: '' # default is process.env.CI_JOB_TOKEN
+      projectId: 123 # default is process.env.CI_PROJECT_ID
+      beforeSha: 1fcba37592714962 # default is process.env.CI_COMMIT_BEFORE_SHA
+      branch: master # default is process.env.CI_COMMIT_REF_NAME
+      projectUrl: https://gitlab.com/xxx/xxx # default is process.env.CI_PROJECT_URL
+      replaceMatch: true # replace match with empty string
+      title: 'deploy log' # default is deploy log
+      goToLink: https://gitlab.com'
+      version: '0.0.1'
+
   convert: # convert file type (now support convert yml to json)
     - target: /path/to/the/file/to/be/converted
       dest: /path/to/output
+
   build: # define the build command list
     - 'npm run webpack'
   resource:

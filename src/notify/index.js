@@ -1,7 +1,19 @@
 // 通知与其他模块的耦合，采用事件的方式，其他模块负责传递事件，notify模块负责判断这个通知是否需要调用
 import CommonNotify from '../common/notify';
 import Bearychat    from './bearychat';
+import DingTalk     from './dingtalk';
 import _            from 'lodash';
+
+// 生成普通节点信息
+function generateNodeMessage (param) {
+  const text = param.text || param.message
+  // 如果是 发布日志，则直接返回 text
+  if (param.node === 'deploy-log') {
+    return text
+  } else {
+    return `**${param.node}** ${text}`;
+  }
+}
 
 const DefaultConfig = {
   title: 'rishiqing-deploy',
@@ -17,13 +29,28 @@ class Notify {
     this.Event.on(this.Events.ON_MESSAGE, this.onMessage.bind(this));
   }
   init () {}
-  formatBearychatText (node, message) {
-    return `**${node}** ${message}`;
+  // 生成消息体
+  generateNotificationBody (param) {
+    const text = generateNodeMessage(param);
+    const title = param.title || this.config.title || 'rishiqing-deploy';
+    const body = {
+      // 把标题拼接到前面
+      text: [`**${title}** `, text].join('\n\n'),
+      title
+    }
+    return body;
   }
   bearychat (param) {
-    param.text = this.formatBearychatText(param.node, param.text || param.message);
-    param.notification = param.title || this.config.title || 'rishiqing-deploy';
+    const body = this.generateNotificationBody(param);
+    param.text = body.text;
+    param.notification = body.title;
     Bearychat(param.hook, param);
+  }
+  dingtalk (param) {
+    const body = this.generateNotificationBody(param);
+    param.text = body.text;
+    param.title = body.title;
+    DingTalk(param.hook, param);
   }
   judgeNode (nodes, node) {
     if (nodes && _.isArray(nodes)) {
