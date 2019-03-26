@@ -27,7 +27,7 @@ class FileReplace extends DealFile {
             await this.execUpload(upload, { distPath, ignore, target });
           }
         } catch (e) {
-          process.stdout.write(e.message);
+          process.stdout.write(`${e.message}\n`);
         }
       }
       this.oneFileReplaceNotify(target);

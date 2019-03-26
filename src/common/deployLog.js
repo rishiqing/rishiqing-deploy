@@ -58,6 +58,19 @@ async function getLogFromGitlab (param) {
   const gitlabUrl = param.url || process.env.CI_PAGES_URL;
   const jobToken = param.jobToken || process.env.CI_JOB_TOKEN;
 
+  // eslint-disable-next-line
+  console.log('branch: ', branch)
+  // eslint-disable-next-line
+  console.log('projectId: ', projectId)
+  // eslint-disable-next-line
+  console.log('beforeSha: ', beforeSha)
+  // eslint-disable-next-line
+  console.log('projectUrl: ', projectUrl)
+  // eslint-disable-next-line
+  console.log('gitlabUrl: ', gitlabUrl)
+  // eslint-disable-next-line
+  console.log('jobToken: ', jobToken)
+
   if (!gitlabUrl) {
     // eslint-disable-next-line
     console.warn('deployLog.param.url not define, it will be https://gitlab.com by default');

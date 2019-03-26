@@ -25,7 +25,7 @@ class Resource extends DealFile {
             await this.execUpload(upload, { distPath, ignore });
           }
         } catch (e) {
-          process.stdout.write(e.message);
+          process.stdout.write(`${e.message}\n`);
         }
       }
       this.oneResourceNotify(dest.dist);
