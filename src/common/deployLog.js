@@ -1,44 +1,37 @@
-import Gitlab from 'gitlab';
-import _ from 'lodash';
 import moment from 'moment';
+import gitRawCommits from 'git-raw-commits';
 
-// 获取 beforeSha 之前的所有commits
-// options = { projectId, beforeSha, page, branch }
-async function getCommitsFromGitlab (api, options) {
-  const {
-    projectId, // 项目id
-    beforeSha, // 上一次构建的 sha
-    page = 1, // 获取第几页数据
-    branch // 分支
-  } = options
-  const list = [];
-  // 最多只能获取3页数据，每页20条，也即共60条
-  if (page > 3) return list
-  const commits = await api.Commits.all(projectId, {
-    perPage: 20,
-    page,
-    ref_name: branch
+// 从本地获取git
+async function getCommitsFromGit (from) {
+  const readable = gitRawCommits({
+    from,
+    format: '--rishiqing-deploy-read-commit--{"message": "%s", "body": "%b", "id": "%H", "short_id": "%h", "author_name": "%an", "committed_date": "%cD"}'
   })
-  // 看能否通过before sha找到指定的commit
-  const index = _.findIndex(commits, { id: beforeSha })
-  if (index !== -1) {
-    list.push(...commits.slice(0, index));
-  } else {
-    list.push(...commits)
-    if (commits.length === 20) {
-      const templist = await getCommitsFromGitlab(api, {
-        projectId,
-        beforeSha,
-        branch,
-        page: page + 1
-      });
-      list.push(...templist)
-    }
-  }
-  return list
+  let logs = '';
+  return new Promise((resolve) => {
+    readable.on('readable', () => {
+      const chunk = readable.read()
+      if (chunk) {
+        logs += chunk.toString()
+      } else {
+        let logList = logs.split('--rishiqing-deploy-read-commit--')
+        logList = logList.filter(log => log)
+          .map(log => {
+            let f = log.replace(/\n$/, '').replace(/\n/g, '\\n')
+            try {
+              return JSON.parse(f)
+            } catch (e) {
+              // eslint-disable-next-line
+              console.error('json parse error', f);
+            }
+          });
+        resolve(logList)
+      }
+    })
+  })
 }
 
-async function getLogFromGitlab (param) {
+async function getLogFromGitlab (param = {}) {
   let pattern;
   let attributes;
   if (/^\/[\s\S]+\/[igm]*$/i.test(param.match)) {
@@ -52,64 +45,43 @@ async function getLogFromGitlab (param) {
   const reg = new RegExp(pattern, attributes);
   // 分支默认是从 param里获取，如果 param里没有配置，则从 CI_COMMIT_REF_NAME 环境变量里获取
   const branch = param.branch || process.env.CI_COMMIT_REF_NAME;
-  const projectId = param.projectId || process.env.CI_PROJECT_ID;
   const beforeSha = param.beforeSha || process.env.CI_COMMIT_BEFORE_SHA;
   const projectUrl = param.projectUrl || process.env.CI_PROJECT_URL;
-  const gitlabUrl = param.url || process.env.CI_PAGES_URL;
-  const jobToken = param.jobToken || process.env.CI_JOB_TOKEN;
 
   // eslint-disable-next-line
   console.log('branch: ', branch)
   // eslint-disable-next-line
-  console.log('projectId: ', projectId)
-  // eslint-disable-next-line
   console.log('beforeSha: ', beforeSha)
   // eslint-disable-next-line
   console.log('projectUrl: ', projectUrl)
-  // eslint-disable-next-line
-  console.log('gitlabUrl: ', gitlabUrl)
-  // eslint-disable-next-line
-  console.log('jobToken: ', jobToken)
 
-  if (!gitlabUrl) {
+  let commits = []
+  try {
+    commits = await getCommitsFromGit(beforeSha)
+  } catch (e) {
+    commits = []
     // eslint-disable-next-line
-    console.warn('deployLog.param.url not define, it will be https://gitlab.com by default');
+    console.error(`get commits error`, e);
   }
-  const data = {
-    url: gitlabUrl
-  }
-  // 优先使用param.token
-  if (param.token) {
-    data.token = param.token;
-  } else if (jobToken) {
-    data.jobToken = jobToken;
-  }
-
-  const api = new Gitlab(data);
-
-  const commits = await getCommitsFromGitlab(api, {
-    projectId,
-    branch,
-    beforeSha
-  });
 
   const logs = commits
     .filter(commit => reg.test(commit.message))
     .map(commit => {
       let message = param.replaceMatch ? commit.message.replace(reg, '') : commit.message
       // 替换掉换行符
-      message = message.replace(/\n/g, '');
+      message = message.replace(/\n$/, '');
       if (projectUrl) {
         message = `[${commit.short_id}](${projectUrl}/commit/${commit.id}) ${message}`;
       } else {
-        message = `${commit.short_id} ${message}`;
+        message = `**${commit.short_id}** ${message}`;
       }
       // 加上作者名字
       message += ` -- ${commit.author_name}`;
       // 加上时间
       const deta = moment(commit.committed_date).format('YYYY-MM-DD HH:mm')
       message += ` (${deta})`;
-      message = `> ${message}`
+      message = `> ${message} \n\n`;
+      message += `> ${commit.body.replace(/\n$/, '')}`;
       return message
     })
 
@@ -143,10 +115,7 @@ async function getLogFromGitlab (param) {
 // 从gitlab获取发布日志
 export default {
   async getLog (config) {
-    let logs = '';
-    if (config.type === 'gitlab') {
-      logs = await getLogFromGitlab(config.param)
-    }
+    const logs = await getLogFromGitlab(config)
     return logs;
   }
 };
