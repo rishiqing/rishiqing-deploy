@@ -147,10 +147,16 @@ async function getLogFromGitlab (param = {}) {
       // 加上时间
       // eslint-disable-next-line no-console
       console.log('committed_date: ', commit.committed_date)
-      const deta = moment(commit.committed_date).tz(timeZone).format(timeFormat)
       // eslint-disable-next-line no-console
-      console.log('deta: ', deta)
-      message += ` (${deta} ${timeZone})`;
+      console.log('committed_date format: ', moment(commit.committed_date).format())
+      // eslint-disable-next-line no-console
+      console.log('committed_date new Date: ', new Date(commit.committed_date))
+      // eslint-disable-next-line no-console
+      console.log('new Date: ', new Date())
+      const date = moment(commit.committed_date).tz(timeZone).format(timeFormat)
+      // eslint-disable-next-line no-console
+      console.log('date: ', date)
+      message += ` (${date} ${timeZone})`;
       message = `> ${message} \n\n`;
       message += `> ${commit.body.replace(/\n$/, '')}`;
       return message
