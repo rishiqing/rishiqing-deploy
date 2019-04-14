@@ -153,7 +153,7 @@ async function getLogFromGitlab (param = {}) {
       console.log('committed_date new Date: ', new Date(commit.committed_date))
       // eslint-disable-next-line no-console
       console.log('new Date: ', new Date())
-      const date = moment(commit.committed_date).tz(timeZone).format(timeFormat)
+      const date = moment(new Date(commit.committed_date)).tz(timeZone).format(timeFormat)
       // eslint-disable-next-line no-console
       console.log('date: ', date)
       message += ` (${date} ${timeZone})`;
