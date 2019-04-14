@@ -88,6 +88,10 @@ default: # the default config
   deployLog: # deploy log
     match: '/^log--/' # match commit message begin with log--
     beforeSha: 1fcba37592714962 # default is process.env.CI_COMMIT_BEFORE_SHA
+    tagPrefix: master-deploy- # default is master-deploy-
+    tagMatch: '/master-deploy-v(0|[1-9]\d*).(0|[1-9]\d*).(0|[1-9]\d*)/'
+    timeZone: 'Asia/Shanghai' # default is Asia/Shanghai
+    timeFormat: 'YYYY-MM-DD HH:mm' # default is YYYY-MM-DD HH:mm
     branch: master # default is process.env.CI_COMMIT_REF_NAME
     projectUrl: https://gitlab.com/xxx/xxx # default is process.env.CI_PROJECT_URL
     replaceMatch: true # replace match with empty string

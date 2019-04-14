@@ -1,14 +1,49 @@
-import moment from 'moment';
+import moment from 'moment-timezone';
 import gitRawCommits from 'git-raw-commits';
+import gitSemverTags from 'git-semver-tags';
+import SimpleGit from 'simple-git';
 
-// 从本地获取git
+const simpleGit = SimpleGit();
+
+// 通过匹配标签找到上一个标签的sha，然后通过这个sha去找到对应的commits
+async function getBeforeShaFromtTag (tagPrefix, tagMatch) {
+  const reg = createRegex(tagMatch)
+  return new Promise((resolve, reject) => {
+    gitSemverTags((err, tags) => {
+      if (err) {
+        reject(err)
+        return;
+      }
+      // 利用 tagMatch 过滤标签
+      const filters = tags.filter(tag => reg.test(tag));
+      // 取得上一个标签
+      const lastTag = filters[1];
+      if (!lastTag) {
+        resolve(null)
+        return;
+      }
+      simpleGit.revparse([lastTag], (err, hash) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        // 把末尾的换行符给删掉
+        resolve(hash.replace(/\n$/, ''));
+      })
+    }, {
+      tagPrefix
+    })
+  })
+}
+
+// 从本地获取git commit
 async function getCommitsFromGit (from) {
   const readable = gitRawCommits({
     from,
     format: '--rishiqing-deploy-read-commit--{"message": "%s", "body": "%b", "id": "%H", "short_id": "%h", "author_name": "%an", "committed_date": "%cD"}'
   })
   let logs = '';
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     readable.on('readable', () => {
       const chunk = readable.read()
       if (chunk) {
@@ -28,25 +63,57 @@ async function getCommitsFromGit (from) {
         resolve(logList)
       }
     })
+    readable.on('error', (error) => {
+      reject(error)
+    })
   })
 }
 
-async function getLogFromGitlab (param = {}) {
-  let pattern;
-  let attributes;
-  if (/^\/[\s\S]+\/[igm]*$/i.test(param.match)) {
-    const matchs = param.match.match(/^\/([\s\S]+)\/([igm]*)$/i);
-    pattern = matchs[1];
-    attributes = matchs[2];
+function createRegex (match) {
+  if (isRegexString(match)) {
+    const matchs = match.match(/^\/([\s\S]+)\/([igm]*)$/i);
+    const pattern = matchs[1];
+    const attributes = matchs[2];
+    return new RegExp(pattern, attributes);
   } else {
+    return new RegExp();
+  }
+}
+
+function isRegexString (match) {
+  if (/^\/[\s\S]+\/[igm]*$/i.test(match)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+async function getLogFromGitlab (param = {}) {
+  if (!isRegexString(param.match)) {
     // eslint-disable-next-line
     console.warn('deployLog.param.match shoud be regex');
   }
-  const reg = new RegExp(pattern, attributes);
+  const reg = createRegex(param.match);
   // 分支默认是从 param里获取，如果 param里没有配置，则从 CI_COMMIT_REF_NAME 环境变量里获取
   const branch = param.branch || process.env.CI_COMMIT_REF_NAME;
-  const beforeSha = param.beforeSha || process.env.CI_COMMIT_BEFORE_SHA;
   const projectUrl = param.projectUrl || process.env.CI_PROJECT_URL;
+  const timeZone = param.timeZone || 'Asia/Shanghai';
+  const timeFormat = param.timeFormat || 'YYYY-MM-DD HH:mm';
+  const tagPrefix = param.tagPrefix || 'master-deploy-';
+
+  let beforeSha = param.beforeSha || process.env.CI_COMMIT_BEFORE_SHA;
+  // 如果beforeSha为空，或者beforeSha全是0
+  if (
+    (!beforeSha || /^0+$/.test(beforeSha))
+    && param.tagPrefix
+  ) {
+    try {
+      beforeSha = await getBeforeShaFromtTag(tagPrefix, param.tagMatch)
+    } catch(e) {
+      // eslint-disable-next-line
+      console.error(`get before sha form tag error`, e);
+    }
+  }
 
   // eslint-disable-next-line
   console.log('branch: ', branch)
@@ -78,8 +145,8 @@ async function getLogFromGitlab (param = {}) {
       // 加上作者名字
       message += ` -- ${commit.author_name}`;
       // 加上时间
-      const deta = moment(commit.committed_date).format('YYYY-MM-DD HH:mm')
-      message += ` (${deta})`;
+      const deta = moment(commit.committed_date).tz(timeZone).format(timeFormat)
+      message += ` (${deta} T ${timeZone})`;
       message = `> ${message} \n\n`;
       message += `> ${commit.body.replace(/\n$/, '')}`;
       return message
@@ -107,7 +174,7 @@ async function getLogFromGitlab (param = {}) {
     if (param.goToLink) {
       headerList.push(`[GO_TO](${param.goToLink})`)
     }
-    headerList.push(`time: (${moment().format('YYYY-MM-DD HH:mm')})`)
+    headerList.push(`time: (${moment().tz(timeZone).format(timeFormat)} T ${timeZone})`)
 
   return [headerList.join(' | '), ...logs].join('\n\n')
 }
