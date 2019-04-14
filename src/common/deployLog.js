@@ -145,8 +145,12 @@ async function getLogFromGitlab (param = {}) {
       // 加上作者名字
       message += ` -- ${commit.author_name}`;
       // 加上时间
+      // eslint-disable-next-line no-console
+      console.log('committed_date: ', commit.committed_date)
       const deta = moment(commit.committed_date).tz(timeZone).format(timeFormat)
-      message += ` (${deta} T ${timeZone})`;
+      // eslint-disable-next-line no-console
+      console.log('deta: ', deta)
+      message += ` (${deta} ${timeZone})`;
       message = `> ${message} \n\n`;
       message += `> ${commit.body.replace(/\n$/, '')}`;
       return message
@@ -174,7 +178,7 @@ async function getLogFromGitlab (param = {}) {
     if (param.goToLink) {
       headerList.push(`[GO_TO](${param.goToLink})`)
     }
-    headerList.push(`time: (${moment().tz(timeZone).format(timeFormat)} T ${timeZone})`)
+    headerList.push(`time: (${moment().tz(timeZone).format(timeFormat)} ${timeZone})`)
 
   return [headerList.join(' | '), ...logs].join('\n\n')
 }
