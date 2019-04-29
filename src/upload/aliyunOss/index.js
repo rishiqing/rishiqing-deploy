@@ -2,7 +2,6 @@ import Upload         from '../../common/upload';
 import OSS            from 'ali-oss';
 import guessType      from 'guess-content-type';
 import path           from 'path';
-import fs             from 'fs';
 
 class AliyunOss extends Upload {
   get uploadType () {
@@ -27,7 +26,12 @@ class AliyunOss extends Upload {
     if (file.file.isGzip) {
       headers['Content-Encoding'] = 'gzip';
     }
-    await this.oss.put(_key, fs.createReadStream(file.file.path), {
+    await this.oss.multipartUpload(_key, file.file.path, {
+      parallel: 4,
+      partSize: 1024 * 1024,
+      progress: function (p, cpt) {
+        if (cpt) process.stdout.write(`${cpt.name} process: ${Math.floor(p * 100)}%\n`);
+      },
       headers
     });
     this.uploadNotify(key);
