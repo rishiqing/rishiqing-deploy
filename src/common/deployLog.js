@@ -57,7 +57,9 @@ async function getCommitsFromGit (from) {
               return JSON.parse(f)
             } catch (e) {
               // eslint-disable-next-line
-              console.error('json parse error', f);
+              console.error('json parse error stack: ', e)
+              // eslint-disable-next-line
+              console.error('json parse error string: ', f);
             }
           });
         resolve(logList)
@@ -132,7 +134,7 @@ async function getLogFromGitlab (param = {}) {
   }
 
   const logs = commits
-    .filter(commit => reg.test(commit.message))
+    .filter(commit => commit && commit.message && reg.test(commit.message))
     .map(commit => {
       let message = param.replaceMatch ? commit.message.replace(reg, '') : commit.message
       // 替换掉换行符
@@ -145,17 +147,8 @@ async function getLogFromGitlab (param = {}) {
       // 加上作者名字
       message += ` -- ${commit.author_name}`;
       // 加上时间
-      // eslint-disable-next-line no-console
-      console.log('committed_date: ', commit.committed_date)
-      // eslint-disable-next-line no-console
-      console.log('committed_date format: ', moment(commit.committed_date).format())
-      // eslint-disable-next-line no-console
-      console.log('committed_date new Date: ', new Date(commit.committed_date))
-      // eslint-disable-next-line no-console
-      console.log('new Date: ', new Date())
       const date = moment(new Date(commit.committed_date)).tz(timeZone).format(timeFormat)
       // eslint-disable-next-line no-console
-      console.log('date: ', date)
       message += ` (${date} ${timeZone})`;
       message = `> ${message} \n\n`;
       message += `> ${commit.body.replace(/\n$/, '')}`;
