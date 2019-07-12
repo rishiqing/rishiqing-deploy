@@ -18,7 +18,9 @@ class Sftp extends Upload {
       client.on('ready', function () {
         resolve(client);
       })
-      .on('error', function () {
+      .on('error', function (error) {
+        // eslint-disable-next-line no-console
+        console.error(error)
         // 不知道为啥，下面执行 this.client.end()的时候，会报错
         process.stdout.write('I don\'t know why this error throw! caused by client.end()\n');
       })
