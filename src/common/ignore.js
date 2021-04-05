@@ -14,7 +14,9 @@ class Ignore {
     for (const file of ignore) {
       let p;
       if (!file) continue;
-      if (/^\/[\s\S]+\/[igm]*$/i.test(file)) { // 如果是正则表达式
+      if (file instanceof RegExp) {
+        regList.push(file)
+      } else if (/^\/[\s\S]+\/[igm]*$/i.test(file)) { // 如果是正则表达式字符串
         const matchs = file.match(/^\/([\s\S]+)\/([igm]*)$/i);
         const pattern = matchs[1];
         const attributes = matchs[2];
