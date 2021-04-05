@@ -73,6 +73,8 @@ async function getCommitsFromGit (from) {
 
 function createRegex (match) {
   if (isRegexString(match)) {
+    // match 直接支持正则对象，方便js直接调用
+    if (match instanceof RegExp) return match
     const matchs = match.match(/^\/([\s\S]+)\/([igm]*)$/i);
     const pattern = matchs[1];
     const attributes = matchs[2];
