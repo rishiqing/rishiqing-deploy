@@ -20,9 +20,21 @@ class Sftp extends Upload {
       })
       .on('error', function (error) {
         // eslint-disable-next-line no-console
-        console.error(error)
-        // 不知道为啥，下面执行 this.client.end()的时候，会报错
-        process.stdout.write('I don\'t know why this error throw! caused by client.end()\n');
+        console.error(JSON.stringify(error, null, 2))
+        if (
+          error.message &&
+          (
+            error.message.indexOf('authentication') >= 0 ||
+            error.message.indexOf('ECONNREFUSED') >= 0 ||
+            error.message.indexOf('ENOTFOUND') >= 0
+          )
+        ) {
+          // 鉴权失败，直接退出
+          process.exit(1);
+        } else {
+          // 不知道为啥，下面执行 this.client.end()的时候，会报错
+          process.stdout.write('I don\'t know why this error throw! caused by client.end()\n');
+        }
       })
       .connect(config);
     });
