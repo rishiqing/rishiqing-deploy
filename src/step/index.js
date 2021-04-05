@@ -10,6 +10,10 @@ import CommonNotify from '../common/notify';
 
 const order = ['build', 'convert', 'resource', 'fileReplace', 'endBuild'];
 class Step extends CommonNotify {
+  /**
+   *
+   * @param {{ config: import('../../types/config').ConfigType }} props
+   */
   constructor (props) {
     super(props);
     this.config = props.config;
